@@ -5,9 +5,22 @@
 
 # returns by ref the route stack singleton
 function &context() {
-  static $context = [];
+  static $context = ['actions' => [], 'midware' => []];
   return $context;
 }
+
+# creates a middleware hook against a path
+function hook($path, callable $func) {
+  $context = &context();
+  array_push($context['midware'], middleware($path, $func));
+}
+
+# creates a middleware to be used by hook()
+function middleware($path, callable $func) {
+  return function ($rpath, ...$args) use ($path, $func) {
+  };
+}
+
 
 # dispatch sapi request against routes context
 function dispatch(...$args) {
@@ -24,14 +37,14 @@ function dispatch(...$args) {
     }
   }
 
-  $responder = serve(context(), $verb, $path, ...$args);
+  $responder = serve(context()['actions'], $verb, $path, ...$args);
   $responder();
 }
 
 # creates an action and puts it into the routes stack
 function route($verb, $path, callable $func) {
   $context = &context();
-  array_push($context, action($verb, $path, $func));
+  array_push($context['actions'], action($verb, $path, $func));
 }
 
 # creates a route handler

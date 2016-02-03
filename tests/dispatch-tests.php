@@ -69,11 +69,11 @@ function test_serve() {
 # context()
 function test_context() {
   $v = &context();
-  $v[] = 'foo';
+  $v['actions'][] = 'foo';
   $x = &context();
-  assert($x === ['foo']);
-  array_shift($x);
-  assert(empty(context()));
+  assert($x['actions'] === ['foo']);
+  array_shift($x['actions']);
+  assert(empty(context()['actions']));
 }
 
 # phtml
@@ -94,7 +94,7 @@ function test_route() {
     return response('hello world!', 201, ['X-Custom-Value' => 'foo']);
   });
   $c = context();
-  $m = $c[0];
+  $m = $c['actions'][0];
   assert(is_callable($m));
   list($f, $v) = $m('GET', '/index');
   assert(empty($v) && is_callable($f()));
